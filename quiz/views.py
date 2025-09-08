@@ -88,4 +88,13 @@ class QuizInvitationViewSet(viewsets.ModelViewSet):
             invitation.accepted = True
             invitation.accepted_at = timezone.now()
             invitation.save()
-        return Response({'accepted': invitation.accepted, 'accepted_at': invitation.accepted_at})
+            # Create participation if not exists
+            participation, created = QuizParticipation.objects.get_or_create(
+                quiz=invitation.quiz,
+                participant=invitation.participant
+            )
+        return Response({
+            'accepted': invitation.accepted,
+            'accepted_at': invitation.accepted_at,
+            'participation_created': created if 'created' in locals() else False
+        })
